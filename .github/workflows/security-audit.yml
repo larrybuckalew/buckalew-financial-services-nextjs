@@ -24,16 +24,13 @@ jobs:
           npm audit --audit-level=high
           npm audit --json > security-audit-report.json
       
-      - name: Scan Dependencies with Snyk
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: GitHub Dependency Review
+        uses: actions/dependency-review-action@v3
         with:
-          command: test
+          fail-on-severity: high
       
-      - name: Check for known vulnerabilities
-        run: |
-          npx known-vulnerabilities-checker
+      - name: Detect Outdated Dependencies
+        run: npm outdated || true
       
       - name: Upload Security Report
         uses: actions/upload-artifact@v3
@@ -41,3 +38,17 @@ jobs:
           name: security-audit-report
           path: security-audit-report.json
           retention-days: 30
+      
+      - name: Create GitHub Issue for Critical Vulnerabilities
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Security Vulnerabilities Detected',
+              body: 'Automated security audit detected potential vulnerabilities. Please review the npm audit and dependency review reports.',
+              labels: ['security', 'vulnerability']
+            })
