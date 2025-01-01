@@ -1,0 +1,46 @@
+name: Staging Deployment
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Run Tests
+        run: npm test
+      
+      - name: Build Application
+        run: npm run build
+      
+      - name: Deploy to Staging Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.STAGING_DEPLOY_HOST }}
+          username: ${{ secrets.STAGING_DEPLOY_USER }}
+          key: ${{ secrets.STAGING_DEPLOY_SSH_KEY }}
+          script: |
+            cd ${{ secrets.STAGING_DEPLOY_PATH }}
+            git pull origin develop
+            npm ci
+            npm run build
+            pm2 restart buckalew-financial-services-staging
+      
+      - name: Run Acceptance Tests
+        run: npm run test:acceptance
