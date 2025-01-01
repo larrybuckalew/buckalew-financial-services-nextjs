@@ -1,10 +1,17 @@
 /** @type {import('next').NextConfig} */
-
 const { withSentry } = require('@sentry/nextjs');
-const helmet = require('helmet');
 
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
+  
+  // Performance Optimizations
+  experimental: {
+    optimizeCss: true,
+    optimizeServerReact: true,
+    serverComponentsExternalPackages: ['mongoose'],
+    optimizePackageImports: ['@/lib/monitoring', '@/lib/cache']
+  },
   
   // Security Headers
   async headers() {
@@ -13,12 +20,16 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
             key: 'X-Frame-Options',
             value: 'SAMEORIGIN'
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload'
           },
           {
             key: 'Referrer-Policy',
@@ -32,16 +43,28 @@ const nextConfig = {
       }
     ];
   },
-
-  // Performance and Monitoring
-  experimental: {
-    optimizePackageImports: ['@/lib/monitoring', '@/lib/cache']
-  },
-
-  // Webpack customizations
+  
+  // Webpack Performance and Security Optimizations
   webpack: (config, { isServer }) => {
-    // Add custom webpack configurations for performance and security
+    // Chunk splitting and optimization
     if (!isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendors: {
+            test: /[\/]node_modules[\/]/,
+            priority: -10,
+            name: 'vendors'
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true
+          }
+        }
+      };
+
+      // Security: prevent access to Node.js core modules on client-side
       config.resolve.fallback = { 
         ...config.resolve.fallback,
         fs: false,
@@ -49,10 +72,9 @@ const nextConfig = {
         tls: false
       };
     }
-
     return config;
   },
-
+  
   // Sentry Configuration
   sentry: {
     disableServerWebpackPlugin: true,
