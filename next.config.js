@@ -1,8 +1,19 @@
 /** @type {import('next').NextConfig} */
+const { withSentryConfig } = require("@sentry/nextjs");
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   
+  // Sentry Configuration
+  sentry: {
+    // Additional configuration options
+    disableServerWebpackPlugin: false,
+    disableClientWebpackPlugin: false,
+    hideSourceMaps: true,
+    widenClientFileUpload: true,
+  },
+
   // Performance Optimizations
   experimental: {
     optimizeCss: true,
@@ -56,4 +67,9 @@ const nextConfig = {
   }
 };
 
-module.exports = nextConfig;
+module.exports = withSentryConfig(nextConfig, {
+  // Additional Sentry webpack plugin settings
+  silent: true,
+  org: "buckalew-financial-services",
+  project: "web-app"
+});
