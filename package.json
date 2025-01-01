@@ -1,0 +1,21 @@
+{
+  "name": "buckalew-financial-services",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "sentry:sourcemaps": "sentry-cli releases files RELEASE_NAME upload-sourcemaps ./build",
+    "sentry:release": "sentry-cli releases new RELEASE_NAME && sentry-cli releases set-commits RELEASE_NAME --auto"
+  },
+  "dependencies": {
+    "@sentry/nextjs": "^7.x.x",
+    "@sentry/profiling-node": "^1.x.x",
+    "next": "^13.x.x",
+    "react": "^18.x.x",
+    "react-dom": "^18.x.x"
+  },
+  "devDependencies": {
+    "@sentry/cli": "^2.x.x"
+  }
+}
