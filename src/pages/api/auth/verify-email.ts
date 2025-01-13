@@ -19,11 +19,10 @@ export default async function handler(
     }
 
     const user = await verifyEmail(token);
-    const { password: _, ...safeUser } = user;
 
     return res.status(200).json({
       message: 'Email verified successfully',
-      user: safeUser,
+      user,
     });
   } catch (error) {
     console.error('Email verification error:', error);

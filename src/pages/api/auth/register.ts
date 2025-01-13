@@ -30,12 +30,9 @@ export default async function handler(
       name,
     });
 
-    // Remove sensitive data before sending response
-    const { password: _, ...safeUser } = user;
-
     return res.status(201).json({
       message: 'Registration successful',
-      user: safeUser,
+      user,
     });
   } catch (error) {
     if (error.message === 'User already exists') {
