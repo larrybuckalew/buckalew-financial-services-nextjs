@@ -17,16 +17,16 @@ export default async function handler(
 
   if (req.method === 'GET') {
     try {
-      // Get user growth data (last 7 days)
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      // Get user growth data (last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       const userGrowth = await prisma.$queryRaw`
         SELECT 
           DATE("createdAt") as date,
           COUNT(*) as count
         FROM "User"
-        WHERE "createdAt" >= ${sevenDaysAgo}
+        WHERE "createdAt" >= ${thirtyDaysAgo}
         GROUP BY DATE("createdAt")
         ORDER BY date ASC
       `;
@@ -39,36 +39,85 @@ export default async function handler(
         },
       });
 
-      const formattedUsersByRole = usersByRole.map(item => ({
-        role: item.role,
-        count: item._count.role,
-      }));
-
-      // Get activity metrics
-      const totalUsers = await prisma.user.count();
-      const verifiedUsers = await prisma.user.count({
-        where: { emailVerified: true },
-      });
-      const activeProfiles = await prisma.profile.count({
+      // Get user engagement metrics
+      const activeUsersLast7Days = await prisma.user.count({
         where: {
-          OR: [
+          lastLogin: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          }
+        }
+      });
+
+      const activeUsersLast30Days = await prisma.user.count({
+        where: {
+          lastLogin: {
+            gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+          }
+        }
+      });
+
+      // Get risk profile distribution
+      const riskProfiles = await prisma.profile.groupBy({
+        by: ['riskProfile'],
+        _count: true,
+        where: {
+          riskProfile: { not: null }
+        }
+      });
+
+      // Get profile completion rate
+      const totalUsers = await prisma.user.count();
+      const usersWithCompleteProfiles = await prisma.profile.count({
+        where: {
+          AND: [
             { phoneNumber: { not: null } },
             { address: { not: null } },
-            { investmentGoals: { not: null } },
-          ],
-        },
+            { riskProfile: { not: null } },
+            { investmentGoals: { not: null } }
+          ]
+        }
       });
 
+      const profileCompletionRate = (usersWithCompleteProfiles / totalUsers) * 100;
+
+      // Get geographical distribution
+      const usersByState = await prisma.profile.groupBy({
+        by: ['state'],
+        _count: true,
+        where: {
+          state: { not: null }
+        }
+      });
+
+      // Get notification engagement
+      const notificationStats = await prisma.$queryRaw`
+        SELECT 
+          type,
+          COUNT(*) as total,
+          SUM(CASE WHEN read = true THEN 1 ELSE 0 END) as read_count
+        FROM "Notification"
+        GROUP BY type
+      `;
+
+      // Format the response data
       const activityMetrics = [
         { metric: 'Total Users', value: totalUsers },
-        { metric: 'Verified Users', value: verifiedUsers },
-        { metric: 'Complete Profiles', value: activeProfiles },
+        { metric: 'Active Users (7 Days)', value: activeUsersLast7Days },
+        { metric: 'Active Users (30 Days)', value: activeUsersLast30Days },
+        { metric: 'Profile Completion Rate', value: `${profileCompletionRate.toFixed(1)}%` },
+        { metric: 'Complete Profiles', value: usersWithCompleteProfiles },
       ];
 
       return res.status(200).json({
         userGrowth,
-        usersByRole: formattedUsersByRole,
+        usersByRole: usersByRole.map(item => ({
+          role: item.role,
+          count: item._count.role,
+        })),
         activityMetrics,
+        riskProfiles,
+        usersByState,
+        notificationStats,
       });
     } catch (error) {
       console.error('Error fetching analytics:', error);
