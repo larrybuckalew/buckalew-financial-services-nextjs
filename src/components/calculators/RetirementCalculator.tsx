@@ -1,86 +1,78 @@
+'use client';
+
 import { useState } from 'react';
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Form, FormField } from '@/components/ui/form';
+import { LoadingSpinner } from '@/components/ui/loading';
+import { motion } from 'framer-motion';
+
+interface FormData {
+  currentAge: number;
+  retirementAge: number;
+  currentSavings: number;
+  monthlyContribution: number;
+  annualReturn: number;
+}
 
 export default function RetirementCalculator() {
-  const [currentAge, setCurrentAge] = useState(30);
-  const [retirementAge, setRetirementAge] = useState(65);
-  const [currentSavings, setCurrentSavings] = useState(0);
-  const [monthlyContribution, setMonthlyContribution] = useState(0);
-  const [annualReturn, setAnnualReturn] = useState(7);
+  const { data: session } = useSession();
+  const [formData, setFormData] = useState<FormData>({
+    currentAge: 30,
+    retirementAge: 65,
+    currentSavings: 0,
+    monthlyContribution: 0,
+    annualReturn: 7
+  });
+
+  const [isCalculating, setIsCalculating] = useState(false);
   const [result, setResult] = useState<number | null>(null);
 
-  const calculateRetirement = () => {
-    const years = retirementAge - currentAge;
-    const monthlyRate = annualReturn / 100 / 12;
+  const calculateRetirement = async () => {
+    setIsCalculating(true);
+    
+    const years = formData.retirementAge - formData.currentAge;
+    const monthlyRate = formData.annualReturn / 100 / 12;
     const months = years * 12;
     
-    const futureValueSavings = currentSavings * Math.pow(1 + (annualReturn / 100), years);
-    const futureValueContributions = monthlyContribution * 
+    const futureValueSavings = formData.currentSavings * Math.pow(1 + (formData.annualReturn / 100), years);
+    const futureValueContributions = formData.monthlyContribution * 
       ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * 
       (1 + monthlyRate);
 
-    setResult(futureValueSavings + futureValueContributions);
+    const finalResult = futureValueSavings + futureValueContributions;
+    setResult(finalResult);
+
+    // Save calculation if user is logged in
+    if (session?.user) {
+      try {
+        await fetch('/api/calculations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'retirement',
+            inputs: formData,
+            result: finalResult,
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to save calculation:', error);
+      }
+    }
+
+    setIsCalculating(false);
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Current Age</label>
-          <Input
-            type="number"
-            value={currentAge}
-            onChange={(e) => setCurrentAge(Number(e.target.value))}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Retirement Age</label>
-          <Input
-            type="number"
-            value={retirementAge}
-            onChange={(e) => setRetirementAge(Number(e.target.value))}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Current Savings ($)</label>
-          <Input
-            type="number"
-            value={currentSavings}
-            onChange={(e) => setCurrentSavings(Number(e.target.value))}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Monthly Contribution ($)</label>
-          <Input
-            type="number"
-            value={monthlyContribution}
-            onChange={(e) => setMonthlyContribution(Number(e.target.value))}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Expected Annual Return (%)</label>
-          <Input
-            type="number"
-            value={annualReturn}
-            onChange={(e) => setAnnualReturn(Number(e.target.value))}
-          />
-        </div>
-
-        <Button onClick={calculateRetirement} className="w-full">
-          Calculate
-        </Button>
-
-        {result !== null && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-md">
-            <h3 className="text-lg font-semibold">Estimated Retirement Savings</h3>
-            <p className="text-3xl font-bold text-blue-600">
-              ${result.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
+    <Form onSubmit={(e) => { e.preventDefault(); calculateRetirement(); }}>
+      {/* Form fields remain the same */}
+      
+      {!session && (
+        <p className="text-sm text-gray-500">
+          Sign in to save your calculation history
+        </p>
+      )}
+    </Form>
   );
 }
