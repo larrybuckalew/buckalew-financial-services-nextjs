@@ -1,17 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    unoptimized: false,
+  reactStrictMode: true,
+  swcMinify: true,
+  typescript: {
+    ignoreBuildErrors: false
+  },
+  eslint: {
+    ignoreDuringBuilds: false
   },
   experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['@mui/icons-material'],
+    appDir: true
   },
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-  staticPageGenerationTimeout: 120,
-  compress: true,
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false, net: false, tls: false };
+    return config;
+  }
 };
 
 module.exports = nextConfig;
