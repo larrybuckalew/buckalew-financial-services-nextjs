@@ -1,25 +1,39 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { Ratelimit } from '@upstash/ratelimit';
-import { redis } from './lib/redis';
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(20, '10 s'),
-});
+export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
 
-export async function middleware(request: NextRequest) {
-  const ip = request.ip ?? '127.0.0.1';
+  // Define public routes that don't require authentication
+  const isPublicPath = path === '/login' || path === '/register' || path === '/';
 
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    const { success } = await ratelimit.limit(ip);
-    
-    if (!success) {
-      return new NextResponse('Too Many Requests', {
-        status: 429,
-      });
-    }
+  // Get the token from the cookies
+  const token = request.cookies.get('authToken')?.value || '';
+
+  // If trying to access a public path while authenticated, redirect to dashboard
+  if (isPublicPath && token) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // If trying to access a protected route without authentication, redirect to login
+  if (!isPublicPath && !token) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return NextResponse.next();
 }
+
+// See "Matching Paths" below to learn more
+export const config = {
+  matcher: [
+    '/',
+    '/login',
+    '/register',
+    '/dashboard/:path*',
+    '/services/:path*',
+    '/calculators/:path*',
+    '/documents/:path*',
+    '/messages/:path*',
+    '/settings/:path*'
+  ]
+};
