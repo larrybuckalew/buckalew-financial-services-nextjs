@@ -1,75 +1,17 @@
 /** @type {import('next').NextConfig} */
-const { withSentryConfig } = require("@sentry/nextjs");
-
 const nextConfig = {
-  reactStrictMode: true,
-  poweredByHeader: false,
-  
-  // Sentry Configuration
-  sentry: {
-    // Additional configuration options
-    disableServerWebpackPlugin: false,
-    disableClientWebpackPlugin: false,
-    hideSourceMaps: true,
-    widenClientFileUpload: true,
+  images: {
+    unoptimized: false,
   },
-
-  // Performance Optimizations
   experimental: {
     optimizeCss: true,
-    optimizeServerReact: true,
-    serverComponentsExternalPackages: ['mongoose']
+    optimizePackageImports: ['@mui/icons-material'],
   },
-
-  // Security Headers
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains; preload'
-          }
-        ]
-      }
-    ];
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
-
-  // Webpack Performance Optimizations
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendors: {
-            test: /[\/]node_modules[\/]/,
-            priority: -10,
-            name: 'vendors'
-          },
-          default: {
-            minChunks: 2,
-            priority: -20,
-            reuseExistingChunk: true
-          }
-        }
-      };
-    }
-    return config;
-  }
+  staticPageGenerationTimeout: 120,
+  compress: true,
 };
 
-module.exports = withSentryConfig(nextConfig, {
-  // Additional Sentry webpack plugin settings
-  silent: true,
-  org: "buckalew-financial-services",
-  project: "web-app"
-});
+module.exports = nextConfig;
