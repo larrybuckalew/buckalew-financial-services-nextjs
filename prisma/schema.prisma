@@ -1,4 +1,11 @@
-// ... existing models
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 model Notification {
   id        String   @id @default(cuid())
@@ -11,6 +18,69 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String?
+  password           String
+  emailVerified      Boolean   @default(false)
+  role               UserRole  @default(USER)
+  lastLogin          DateTime?
+  loginAttempts      Int       @default(0)
+  lockoutTime        DateTime?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  twoFactorSecret    String?
+  twoFactorEnabled   Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  
+  profile            UserProfile?
+  sessions           UserSession[]
+  documents          UserDocument[]
+  notifications      Notification[]
+  userSettings       UserSettings?
+}
+
+model UserProfile {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id])
+  
+  phoneNumber  String?
+  address      String?
+  dateOfBirth  DateTime?
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  token     String   @unique
+  ipAddress String?
+  device    String?
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model UserDocument {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  title       String
+  fileType    String
+  fileUrl     String
+  uploadedAt  DateTime @default(now())
+}
+
+enum UserRole {
+  USER
+  PREMIUM
+  ADMIN
+}
+
 model UserSettings {
   id                    String  @id @default(cuid())
   userId                String  @unique
@@ -19,7 +89,7 @@ model UserSettings {
   goalAlerts            Boolean @default(true)
   marketUpdates         Boolean @default(false)
   defaultCurrency       String  @default("USD")
-  dateFormat           String  @default("MM/DD/YYYY")
-  theme                String  @default("light")
-  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateFormat            String  @default("MM/DD/YYYY")
+  theme                 String  @default("light")
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
