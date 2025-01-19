@@ -1,24 +1,13 @@
-// Existing User and Session models...
+// ... existing models
 
-model FinancialProfile {
-  id              String    @id @default(cuid())
-  userId          String    @unique
-  totalAssets     Float     @default(0)
-  monthlySavings  Float     @default(0)
-  investmentGoals Float     @default(0)
-  riskTolerance   String    @default("MODERATE")
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-}
+model FinancialMetric {
+  id                String   @id @default(cuid())
+  userId            String
+  date              DateTime
+  totalAssets       Float
+  monthlySavings    Float
+  investmentReturns Float
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model Calculation {
-  id          String    @id @default(cuid())
-  userId      String
-  type        String    // LOAN, INVESTMENT, etc.
-  parameters  Json
-  results     Json
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  @@unique([userId, date])
 }
