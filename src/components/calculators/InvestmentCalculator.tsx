@@ -1,92 +1,109 @@
-'use client';
+import { useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-import React, { useState } from 'react';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-
-interface InvestmentResult {
-  initialInvestment: number;
-  annualContribution: number;
-  years: number;
-  interestRate: number;
-  finalBalance: number;
-  totalContributions: number;
-  totalInterest: number;
+interface InvestmentData {
+  year: number;
+  balance: number;
+  contributions: number;
+  earnings: number;
 }
 
 export default function InvestmentCalculator() {
-  const [initialInvestment, setInitialInvestment] = useState<number>(0);
-  const [annualContribution, setAnnualContribution] = useState<number>(0);
-  const [years, setYears] = useState<number>(0);
-  const [interestRate, setInterestRate] = useState<number>(0);
-  const [result, setResult] = useState<InvestmentResult | null>(null);
+  const [initialAmount, setInitialAmount] = useState(10000);
+  const [monthlyContribution, setMonthlyContribution] = useState(500);
+  const [returnRate, setReturnRate] = useState(7);
+  const [years, setYears] = useState(30);
+  const [data, setData] = useState<InvestmentData[]>([]);
 
   const calculateInvestment = () => {
-    const principal = initialInvestment;
-    const contribution = annualContribution;
-    const rate = interestRate / 100;
-    const periods = years;
+    const annualRate = returnRate / 100;
+    const monthlyRate = annualRate / 12;
+    let balance = initialAmount;
+    const newData: InvestmentData[] = [];
+    let totalContributions = initialAmount;
 
-    let finalBalance = principal;
-    let totalContributions = principal;
+    for (let year = 1; year <= years; year++) {
+      let yearlyContributions = monthlyContribution * 12;
+      totalContributions += yearlyContributions;
 
-    for (let year = 1; year <= periods; year++) {
-      finalBalance = (finalBalance + contribution) * (1 + rate);
+      // Calculate compound interest with monthly contributions
+      for (let month = 1; month <= 12; month++) {
+        balance = balance * (1 + monthlyRate) + monthlyContribution;
+      }
+
+      newData.push({
+        year,
+        balance,
+        contributions: totalContributions,
+        earnings: balance - totalContributions
+      });
     }
 
-    totalContributions += contribution * periods;
-    const totalInterest = finalBalance - totalContributions;
-
-    setResult({
-      initialInvestment: principal,
-      annualContribution: contribution,
-      years: periods,
-      interestRate: rate * 100,
-      finalBalance: Math.round(finalBalance),
-      totalContributions: Math.round(totalContributions),
-      totalInterest: Math.round(totalInterest)
-    });
+    setData(newData);
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">Investment Calculator</h2>
-      <div className="space-y-4">
-        <Input
-          type="number"
-          label="Initial Investment ($)"
-          value={initialInvestment}
-          onChange={(e) => setInitialInvestment(Number(e.target.value))}
-        />
-        <Input
-          type="number"
-          label="Annual Contribution ($)"
-          value={annualContribution}
-          onChange={(e) => setAnnualContribution(Number(e.target.value))}
-        />
-        <Input
-          type="number"
-          label="Investment Period (Years)"
-          value={years}
-          onChange={(e) => setYears(Number(e.target.value))}
-        />
-        <Input
-          type="number"
-          label="Annual Interest Rate (%)"
-          value={interestRate}
-          onChange={(e) => setInterestRate(Number(e.target.value))}
-        />
-        <Button onClick={calculateInvestment} className="w-full">
-          Calculate
-        </Button>
+    <div className="bg-white p-6 rounded-lg shadow">
+      <h2 className="text-xl font-semibold mb-4">Investment Calculator</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Initial Investment</label>
+          <input
+            type="number"
+            value={initialAmount}
+            onChange={(e) => setInitialAmount(Number(e.target.value))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Monthly Contribution</label>
+          <input
+            type="number"
+            value={monthlyContribution}
+            onChange={(e) => setMonthlyContribution(Number(e.target.value))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Annual Return Rate (%)</label>
+          <input
+            type="number"
+            value={returnRate}
+            onChange={(e) => setReturnRate(Number(e.target.value))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Investment Period (years)</label>
+          <input
+            type="number"
+            value={years}
+            onChange={(e) => setYears(Number(e.target.value))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
       </div>
-
-      {result && (
-        <div className="mt-6 bg-gray-100 p-4 rounded-lg">
-          <h3 className="text-xl font-semibold mb-3">Investment Projection</h3>
-          <p>Final Balance: ${result.finalBalance.toLocaleString()}</p>
-          <p>Total Contributions: ${result.totalContributions.toLocaleString()}</p>
-          <p>Total Interest Earned: ${result.totalInterest.toLocaleString()}</p>
+      <button
+        onClick={calculateInvestment}
+        className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+      >
+        Calculate
+      </button>
+      {data.length > 0 && (
+        <div className="mt-6">
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="balance" stroke="#2563eb" />
+                <Line type="monotone" dataKey="contributions" stroke="#16a34a" />
+                <Line type="monotone" dataKey="earnings" stroke="#9333ea" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
     </div>
