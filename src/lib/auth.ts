@@ -1,68 +1,47 @@
-import bcrypt from 'bcryptjs';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-export async function registerUser(name: string, email: string, password: string) {
-  // Hash the password
-  const hashedPassword = await bcrypt.hash(password, 10);
+export async function hashPassword(password: string) {
+  return bcrypt.hash(password, 10);
+}
 
+export async function comparePasswords(password: string, hash: string) {
+  return bcrypt.compare(password, hash);
+}
+
+export function generateToken(userId: string) {
+  return jwt.sign({ userId }, process.env.JWT_SECRET!, {
+    expiresIn: '7d',
+  });
+}
+
+export async function validateToken(token: string) {
   try {
-    // Create user in database
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword
-      }
-    });
-
-    return { id: user.id, name: user.name, email: user.email };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    return decoded;
   } catch (error) {
-    console.error('Registration error:', error);
-    throw new Error('User registration failed');
+    return null;
   }
 }
 
-export async function authenticateUser(email: string, password: string) {
+export async function authenticateUser(req: NextApiRequest, res: NextApiResponse) {
   try {
-    // Find user by email
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return null;
+
+    const decoded = await validateToken(token);
+    if (!decoded) return null;
+
     const user = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    // Compare passwords
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      throw new Error('Invalid credentials');
-    }
-
-    return { id: user.id, name: user.name, email: user.email };
-  } catch (error) {
-    console.error('Authentication error:', error);
-    throw new Error('Authentication failed');
-  }
-}
-
-export async function getUserById(userId: string) {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        name: true,
-        email: true
-      }
+      where: { id: (decoded as any).userId },
     });
 
     return user;
   } catch (error) {
-    console.error('Get user error:', error);
     return null;
   }
 }
