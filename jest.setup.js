@@ -1,43 +1,19 @@
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
+import { configure } from '@testing-library/react';
 
-// Mock Next.js router
-jest.mock('next/router', () => ({
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
+configure({ testIdAttribute: 'data-testid' });
+
+jest.mock('next/router', () => require('next-router-mock'));
+jest.mock('next/navigation', () => ({
   useRouter() {
     return {
-      route: '/',
-      pathname: '',
-      query: {},
-      asPath: '',
       push: jest.fn(),
       replace: jest.fn(),
-      reload: jest.fn(),
-      back: jest.fn(),
       prefetch: jest.fn(),
-      beforeHistoryChange: jest.fn(),
-      events: {
-        on: jest.fn(),
-        off: jest.fn(),
-        emit: jest.fn(),
-      },
-      isFallback: false,
     };
   },
 }));
-
-// Mock window and localStorage
-const localStorageMock = (() => {
-  let store = {};
-  return {
-    getItem: (key) => store[key] || null,
-    setItem: (key, value) => {
-      store[key] = value.toString();
-    },
-    clear: () => {
-      store = {};
-    }
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock
-});
