@@ -1,34 +1,24 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+// Existing User and Session models...
+
+model FinancialProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  totalAssets     Float     @default(0)
+  monthlySavings  Float     @default(0)
+  investmentGoals Float     @default(0)
+  riskTolerance   String    @default("MODERATE")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  password      String
-  role          Role      @default(USER)
-  emailVerified DateTime?
-  image         String?
-  sessions      Session[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-enum Role {
-  USER
-  ADMIN
+model Calculation {
+  id          String    @id @default(cuid())
+  userId      String
+  type        String    // LOAN, INVESTMENT, etc.
+  parameters  Json
+  results     Json
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
