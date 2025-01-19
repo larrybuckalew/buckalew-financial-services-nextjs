@@ -1,0 +1,35 @@
+# Repository Settings
+repository:
+  # Security and access
+  private: true
+  has_issues: true
+  has_wiki: false
+  has_downloads: true
+  has_projects: false
+
+  # Branch protection rules
+  default_branch: main
+  allow_merge_commit: false
+  allow_rebase_merge: true
+  allow_squash_merge: true
+
+# Collaborator access levels
+collaborators:
+  - username: larrybuckalew
+    permission: admin
+
+# Labels for issues and pull requests
+labels:
+  - name: security
+    color: '#d73a4a'
+    description: Security-related issues
+  - name: dependencies
+    color: '#0366d6'
+    description: Pull requests that update dependencies
+
+# Milestones
+milestones:
+  - title: MVP Release
+    description: Minimum Viable Product milestone
+  - title: Security Hardening
+    description: Focus on improving application security

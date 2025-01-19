@@ -1,0 +1,30 @@
+version: 2
+registries:
+  npm:
+    type: npm-registry
+    url: https://registry.npmjs.org
+    username: ${{secrets.NPM_USERNAME}}
+    password: ${{secrets.NPM_TOKEN}}
+
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "larrybuckalew"
+    labels:
+      - "dependencies"
+    ignore:
+      - dependency-type: "direct:production"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "github-actions"
+      - "dependencies"

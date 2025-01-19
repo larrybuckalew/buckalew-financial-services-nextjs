@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 255 255 255;
+  --foreground: 15 23 42;
+}
+
+[data-theme='dark'] {
+  --background: 15 23 42;
+  --foreground: 255 255 255;
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+}
+
+.dark .dark\:bg-slate-800 {
+  background-color: rgb(30 41 59);
+}
+
+.dark .dark\:text-white {
+  color: rgb(255 255 255);
+}
+
+.dark .dark\:border-slate-600 {
+  border-color: rgb(71 85 105);
+}
