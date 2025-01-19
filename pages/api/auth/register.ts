@@ -1,43 +1,35 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { ValidationError } from '@/lib/errors';
+import prisma from '@/lib/prisma';
 import { hashPassword, generateToken } from '@/lib/auth';
 
-const prisma = new PrismaClient();
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+async function validateRegistration(email: string, password: string) {
+  if (!email.includes('@')) {
+    throw new ValidationError('Invalid email format');
   }
-
-  try {
-    const { email, password, name } = req.body;
-
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email already registered' });
-    }
-
-    const hashedPassword = await hashPassword(password);
-
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name
-      }
-    });
-
-    const token = generateToken(user.id);
-
-    res.status(201).json({
-      user: { id: user.id, email: user.email, name: user.name },
-      token
-    });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Error creating user' });
+  if (password.length < 8) {
+    throw new ValidationError('Password must be at least 8 characters');
   }
 }
+
+export default withErrorHandler(async (req, res) => {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+    return;
+  }
+
+  const { email, password, name } = req.body;
+  await validateRegistration(email, password);
+
+  const hashedPassword = await hashPassword(password);
+  const user = await prisma.user.create({
+    data: { email, password: hashedPassword, name }
+  });
+
+  const token = generateToken(user.id);
+  res.status(201).json({
+    user: { id: user.id, email: user.email, name: user.name },
+    token
+  });
+});
