@@ -5,6 +5,8 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard' },
   { name: 'Financial Tools', href: '/dashboard/tools' },
   { name: 'Profile', href: '/dashboard/profile' },
+  { name: 'Notifications', href: '/dashboard/notifications' },
+  { name: 'Settings', href: '/dashboard/settings' }
 ];
 
 export default function Sidebar() {
