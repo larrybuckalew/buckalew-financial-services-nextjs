@@ -1,27 +1,35 @@
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { useNotifications } from '@/hooks/useNotifications';
 import Link from 'next/link';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const { unreadCount } = useNotifications();
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-white dark:bg-slate-800 shadow-lg transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link href="/dashboard" className="flex items-center">
-              <span className="text-xl font-bold">Buckalew Financial</span>
+          <div className="flex items-center">
+            <Link href="/dashboard">
+              <span className="text-xl font-bold dark:text-white">Buckalew Financial</span>
             </Link>
           </div>
           <div className="flex items-center space-x-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+            >
+              {theme === 'dark' ? '🌞' : '🌙'}
+            </button>
             <Link 
               href="/dashboard/notifications"
-              className="relative p-1 rounded-full hover:bg-gray-100"
+              className="relative p-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700"
             >
               <svg
-                className="h-6 w-6 text-gray-600"
+                className="h-6 w-6 text-gray-600 dark:text-gray-300"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -39,10 +47,10 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <span className="text-gray-700">{user?.email}</span>
+            <span className="text-gray-700 dark:text-gray-300">{user?.email}</span>
             <button
               onClick={logout}
-              className="px-4 py-2 text-sm text-red-600 hover:text-red-800"
+              className="px-4 py-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
             >
               Logout
             </button>
