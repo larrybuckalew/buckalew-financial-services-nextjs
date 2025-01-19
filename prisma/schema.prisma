@@ -7,89 +7,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String   // ALERT, UPDATE, REMINDER
-  title     String
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 model User {
-  id                 String    @id @default(cuid())
-  email              String    @unique
-  name               String?
-  password           String
-  emailVerified      Boolean   @default(false)
-  role               UserRole  @default(USER)
-  lastLogin          DateTime?
-  loginAttempts      Int       @default(0)
-  lockoutTime        DateTime?
-  passwordResetToken String?
-  passwordResetExpires DateTime?
-  twoFactorSecret    String?
-  twoFactorEnabled   Boolean   @default(false)
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  
-  profile            UserProfile?
-  sessions           UserSession[]
-  documents          UserDocument[]
-  notifications      Notification[]
-  userSettings       UserSettings?
+  id            String         @id @default(cuid())
+  email         String        @unique
+  password      String
+  name          String?
+  role          UserRole      @default(USER)
+  emailVerified DateTime?
+  mfaSettings   MfaSettings?
+  sessions      Session[]
+  loginActivity LoginActivity[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
-model UserProfile {
-  id           String    @id @default(cuid())
-  userId       String    @unique
-  user         User      @relation(fields: [userId], references: [id])
-  
-  phoneNumber  String?
-  address      String?
-  dateOfBirth  DateTime?
+model MfaSettings {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  isEnabled     Boolean   @default(false)
+  secret        String?
+  verifiedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
-model UserSession {
+model LoginActivity {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  
-  token     String   @unique
+  timestamp DateTime @default(now())
+  success   Boolean
   ipAddress String?
-  device    String?
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+  userAgent String?
 }
 
-model UserDocument {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  
-  title       String
-  fileType    String
-  fileUrl     String
-  uploadedAt  DateTime @default(now())
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  expires      DateTime
+  sessionToken String   @unique
+  accessToken  String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 enum UserRole {
-  USER
-  PREMIUM
   ADMIN
-}
-
-model UserSettings {
-  id                    String  @id @default(cuid())
-  userId                String  @unique
-  emailNotifications    Boolean @default(true)
-  monthlyReports        Boolean @default(true)
-  goalAlerts            Boolean @default(true)
-  marketUpdates         Boolean @default(false)
-  defaultCurrency       String  @default("USD")
-  dateFormat            String  @default("MM/DD/YYYY")
-  theme                 String  @default("light")
-  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ADVISOR
+  USER
 }
