@@ -1,60 +1,56 @@
-# Dependencies
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# Testing
+# testing
 /coverage
 
-# Next.js
+# next.js
 /.next/
 /out/
 
-# Production
+# production
 /build
 
-# Environment
-.env*
-!.env.example
-
-# Backup
-/_backup
-/_backups
-/buckalew_backup*
-
-# Misc
+# misc
 .DS_Store
 *.pem
-.turbo
-*.log
 
-# Debug
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-<<<<<<< Updated upstream
 # local env files
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+*.env
+!.env.example
+!.env.template
 
-# vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# Prisma
-/prisma/migrations
-
-# IDE
-.idea
-.vscode
-=======
 # Vercel
 .vercel
->>>>>>> Stashed changes
+
+# TypeScript v1 compiled files
+*.tsbuildinfo
+
+# Turborepo
+.turbo
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
