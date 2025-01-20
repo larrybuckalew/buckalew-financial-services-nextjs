@@ -12,7 +12,6 @@ const nextConfig = {
   },
   experimental: {
     optimizeCss: true,
-    optimizeImages: true,
     scrollRestoration: true,
   },
   compiler: {
