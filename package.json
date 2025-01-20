@@ -9,12 +9,21 @@
     "lint": "next lint",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:a11y": "jest --config jest.config.accessibility.ts",
+    "backup": "ts-node src/scripts/backup-db.ts",
+    "docs": "swagger-jsdoc -d swaggerDef.js -o public/swagger.json"
   },
   "dependencies": {
+    "@sentry/nextjs": "^8.50.0",
+    "cron": "^3.5.0",
     "date-fns": "^4.1.0",
+    "helmet": "^8.0.0",
+    "ioredis": "^5.4.2",
+    "jest-axe": "^9.0.0",
     "next": "^14.x.x",
     "next-auth": "^4.x.x",
+    "next-swagger-doc": "^0.4.1",
     "react": "^18.x.x",
     "react-dom": "^18.x.x",
     "recharts": "^2.15.0",
@@ -38,6 +47,8 @@
     "jspdf-autotable": "^3.x.x",
     "papaparse": "^5.5.1",
     "react-hook-form": "^7.x.x",
+    "swagger-jsdoc": "^6.2.8",
+    "ts-node": "^10.9.2",
     "zod": "^3.x.x"
   }
 }

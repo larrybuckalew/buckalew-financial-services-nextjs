@@ -1,12 +1,38 @@
-import Papa from 'papaparse';
-
-export function toCSV(data: any) {
-  if (!Array.isArray(data) || data.length === 0 || !data.every(item => typeof item === 'object' && item !== null)) {
-    throw new Error('Invalid JSON data: Data should be a non-empty array of objects');
+static async toCSV(options: ExportOptions): Promise<void> {
+  // Validate input
+  if (!options.data || options.data.length === 0) {
+    console.warn('No data to export');
+    return;
   }
+
+  // Use dynamic headers if not provided
+  const headers = options.headers || Object.keys(options.data[0] || {});
+
+  // Sanitize data: remove undefined/null, convert to strings
+  const sanitizedData = options.data.map(row => 
+    headers.map(header => {
+      const value = row[header];
+      return value === undefined || value === null ? '' : String(value);
+    })
+  );
+
   try {
-    return Papa.unparse(data);
+    const csv = Papa.unparse({
+      fields: headers,
+      data: sanitizedData
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${options.filename}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   } catch (error) {
-    throw new Error('Error during CSV conversion');
+    console.error('CSV Export Error:', error);
+    throw new Error('Failed to export CSV');
   }
 }

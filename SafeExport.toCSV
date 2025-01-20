@@ -1,0 +1,60 @@
+// src/lib/export/safe-export.ts
+static async toCSV(options: ExportOptions): Promise<void> {
+  // Validate input with more defensive checks
+  if (!options.data || !Array.isArray(options.data) || options.data.length === 0) {
+    console.warn('No valid data to export');
+    return;
+  }
+
+  // Ensure first item is an object
+  const firstItem = options.data[0];
+  if (typeof firstItem !== 'object' || firstItem === null) {
+    console.warn('Invalid data format');
+    return;
+  }
+
+  // Use dynamic headers if not provided
+  const headers = options.headers || Object.keys(firstItem);
+
+  // Robust data sanitization
+  const sanitizedData = options.data.map(row => 
+    headers.map(header => {
+      // Handle nested objects, convert to JSON string if complex
+      const value = row[header];
+      if (value === undefined || value === null) return '';
+      if (typeof value === 'object') {
+        try {
+          return JSON.stringify(value);
+        } catch {
+          return String(value);
+        }
+      }
+      return String(value);
+    })
+  );
+
+  try {
+    const csv = Papa.unparse({
+      fields: headers,
+      data: sanitizedData
+    }, {
+      // Additional Papa Parse configuration for robustness
+      quotes: true,
+      delimiter: ',',
+      newline: '\n'
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${options.filename}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('CSV Export Error:', error);
+    throw new Error(`Failed to export CSV: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}

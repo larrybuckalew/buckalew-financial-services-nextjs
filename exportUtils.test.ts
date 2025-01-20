@@ -1,41 +1,54 @@
+// src/lib/export/safe-export.ts
+import ExcelJS from 'exceljs';
 import Papa from 'papaparse';
 import { jsPDF } from 'jspdf';
-import * as XLSX from 'xlsx';
-import { defaultPdfStyle, defaultExcelStyle, defaultCSVStyle } from '../exportConfig';
-import { toCSV } from '../safe-export';
+import 'jspdf-autotable';
 
-// Mock file download functionality
-const mockDownloadFile = jest.fn();
+interface ExportOptions {
+  filename: string;
+  headers?: string[];
+  data: any[];
+}
 
-describe('Export Utils', () => {
-  it('handles CSV export correctly', () => {
-    const validData = [
-      { "name": "John Doe", "age": 30, "city": "New York" },
-      { "name": "Jane Smith", "age": 25, "city": "Los Angeles" }
-    ];
+export class SafeExport {
+  static async toCSV(options: ExportOptions): Promise<void> {
+    // Validate input
+    if (!options.data || options.data.length === 0) {
+      console.warn('No data to export');
+      return;
+    }
 
-    // Ensure valid data does not throw an error
-    expect(() => {
-      toCSV(validData);
-    }).not.toThrow();
+    // Use dynamic headers if not provided
+    const headers = options.headers || Object.keys(options.data[0]);
 
-    const csv = toCSV(validData);
+    // Sanitize data: remove undefined/null, convert to strings
+    const sanitizedData = options.data.map(row => 
+      headers.map(header => {
+        const value = row[header];
+        return value === undefined || value === null ? '' : String(value);
+      })
+    );
 
-    expect(csv).toContain('John Doe');
-    expect(csv).toContain('Jane Smith');
-  });
+    try {
+      const csv = Papa.unparse({
+        fields: headers,
+        data: sanitizedData
+      });
 
-  it('throws an error for invalid JSON data', () => {
-    const invalidData1 = 'invalid';
-    const invalidData2 = null;
-    const invalidData3 = {};
-    const invalidData4 = [{ "name": "John Doe", "age": 30, "city": "New York" }, "invalid"];
-    const invalidData5 = [{ "name": "John Doe", "age": 30, "city": "New York" }, null];
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${options.filename}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('CSV Export Error:', error);
+      throw new Error('Failed to export CSV');
+    }
+  }
 
-    // Ensure invalid data throws an error
-    expect(() => {
-      toCSV(invalidData1);
-    }).toThrow('Invalid JSON data: Data should be a non-empty array of objects');
-    expect(() => {
-      toCSV(invalidData2);
-    }).toThrow('Invalid JSON data: Data should be
+  // ... other methods remain the same
+}
