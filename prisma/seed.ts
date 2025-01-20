@@ -1,79 +1,57 @@
 import { PrismaClient, UserRole } from '@prisma/client';
-import { hash } from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123456';
-  const hashedPassword = await hash(adminPassword, 12);
-
   // Create admin user
-  const admin = await prisma.user.upsert({
+  const adminUser = await prisma.user.upsert({
     where: { email: 'admin@buckalew.com' },
     update: {},
     create: {
       email: 'admin@buckalew.com',
-      password: hashedPassword,
-      name: 'Admin User',
+      name: 'Larry Buckalew',
       role: UserRole.ADMIN,
-      emailVerified: true,
+      emailVerified: new Date(),
       profile: {
         create: {
-          phone: '555-0100',
-          address: '123 Admin Street',
-          city: 'Adminville',
-          state: 'CA',
-          zip: '90210'
+          phoneNumber: '+1-555-123-4567',
+          address: '123 Financial Street, New York, NY 10001',
+          occupation: 'Financial Services CEO'
         }
       }
     }
   });
 
-  // Create manager user
-  const manager = await prisma.user.upsert({
-    where: { email: 'manager@buckalew.com' },
-    update: {},
-    create: {
-      email: 'manager@buckalew.com',
-      password: hashedPassword,
-      name: 'Manager User',
-      role: UserRole.MANAGER,
-      emailVerified: true,
-      profile: {
-        create: {
-          phone: '555-0200',
-          address: '456 Manager Avenue',
-          city: 'Managerville',
-          state: 'CA',
-          zip: '90211'
-        }
-      }
+  // Create sample investments for admin
+  const sampleInvestments = [
+    {
+      type: 'STOCK',
+      amount: 50000,
+      date: new Date('2024-01-15')
+    },
+    {
+      type: 'BOND',
+      amount: 25000,
+      date: new Date('2024-01-10')
+    },
+    {
+      type: 'REAL_ESTATE',
+      amount: 100000,
+      date: new Date('2024-01-05')
     }
-  });
+  ];
 
-  // Create demo user
-  const user = await prisma.user.upsert({
-    where: { email: 'user@buckalew.com' },
-    update: {},
-    create: {
-      email: 'user@buckalew.com',
-      password: hashedPassword,
-      name: 'Demo User',
-      role: UserRole.USER,
-      emailVerified: true,
-      profile: {
-        create: {
-          phone: '555-0300',
-          address: '789 User Boulevard',
-          city: 'Userville',
-          state: 'CA',
-          zip: '90212'
-        }
+  for (const investment of sampleInvestments) {
+    await prisma.investment.create({
+      data: {
+        ...investment,
+        userId: adminUser.id
       }
-    }
-  });
+    });
+  }
 
-  console.log({ admin, manager, user });
+  console.log('Database seeded successfully');
 }
 
 main()
