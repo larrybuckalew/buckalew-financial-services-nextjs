@@ -1,5 +1,5 @@
 # Dependencies
-node_modules/
+/node_modules
 /.pnp
 .pnp.js
 
@@ -13,53 +13,30 @@ node_modules/
 # Production
 /build
 
-# Environment files
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Debug logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Vercel
+.vercel
 
-# IDE files
+# TypeScript
+*.tsbuildinfo
+
+# IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Prisma
-/prisma/*.db
-/prisma/migrations/
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# Vercel
-.vercel
-
-# PWA files
-public/sw.js
-public/workbox-*.js
-
-# Local files
-*.local
-
-# Binary files
-*.pdf
-*.zip
-*.tar.gz
-*.rar
-
-# Temp files
-*.log
-*.tmp
-.cache/
