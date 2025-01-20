@@ -1,104 +1,101 @@
 import { PrismaClient, NotificationType } from '@prisma/client';
-import { getEmailTemplate } from './notificationTemplates';
-import { sendEmail } from './email';
-import { emitToUser } from './socket';
 
 const prisma = new PrismaClient();
 
-interface NotificationData {
+// Define notification payload interface
+interface NotificationPayload {
   userId: string;
   type: NotificationType;
   title: string;
   message: string;
-  email?: boolean;
-  data?: Record<string, any>;
+  link?: string;
 }
 
-export async function createNotification({
-  userId,
-  type,
-  title,
-  message,
-  email = false,
-  data = {}
-}: NotificationData) {
-  try {
-    // Create notification in database
-    const notification = await prisma.notification.create({
-      data: {
-        userId,
-        type,
-        title,
-        message,
-      },
-    });
-
-    // Send real-time notification via WebSocket
-    emitToUser(userId, 'newNotification', notification);
-
-    // Send email if requested
-    if (email) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
+// Notification service
+export class NotificationService {
+  // Create a new notification
+  static async create(payload: NotificationPayload) {
+    try {
+      return await prisma.notification.create({
+        data: {
+          userId: payload.userId,
+          type: payload.type,
+          title: payload.title,
+          message: payload.message,
+          link: payload.link,
+          isRead: false
+        }
       });
-
-      if (user?.email) {
-        const emailTemplate = getEmailTemplate(type, data);
-        await sendEmail({
-          to: user.email,
-          ...emailTemplate
-        });
-      }
+    } catch (error) {
+      console.error('Notification creation failed:', error);
+      throw new Error('Failed to create notification');
     }
-
-    return notification;
-  } catch (error) {
-    console.error('Error creating notification:', error);
-    throw error;
   }
-}
 
-export async function markNotificationAsRead(id: string, userId: string) {
-  const notification = await prisma.notification.updateMany({
-    where: {
-      id,
-      userId,
-    },
-    data: {
-      read: true,
-    },
-  });
+  // Mark notification as read
+  static async markAsRead(notificationId: string) {
+    try {
+      return await prisma.notification.update({
+        where: { id: notificationId },
+        data: { isRead: true }
+      });
+    } catch (error) {
+      console.error('Marking notification as read failed:', error);
+      throw new Error('Failed to mark notification as read');
+    }
+  }
 
-  // Emit update via WebSocket
-  emitToUser(userId, 'notificationRead', id);
+  // Get user notifications
+  static async getUserNotifications(userId: string, limit = 10) {
+    try {
+      return await prisma.notification.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: limit
+      });
+    } catch (error) {
+      console.error('Fetching notifications failed:', error);
+      throw new Error('Failed to fetch notifications');
+    }
+  }
 
-  return notification;
-}
+  // Create investment-related notifications
+  static async createInvestmentNotification(userId: string, investmentData: any) {
+    try {
+      return await this.create({
+        userId,
+        type: 'INVESTMENT',
+        title: 'New Investment Added',
+        message: `You've added a new ${investmentData.type} investment of $${investmentData.amount.toLocaleString()}`,
+        link: '/investments'
+      });
+    } catch (error) {
+      console.error('Investment notification creation failed:', error);
+    }
+  }
 
-export async function getUserNotifications(userId: string) {
-  return prisma.notification.findMany({
-    where: {
-      userId,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
-}
+  // Create account-related notifications
+  static async createAccountNotification(userId: string, notificationType: 'LOGIN' | 'PROFILE_UPDATE') {
+    const notificationMap = {
+      'LOGIN': {
+        title: 'New Login Detected',
+        message: 'A new login was detected on your account'
+      },
+      'PROFILE_UPDATE': {
+        title: 'Profile Updated',
+        message: 'Your profile information was recently updated'
+      }
+    };
 
-export async function deleteNotification(id: string, userId: string) {
-  return prisma.notification.deleteMany({
-    where: {
-      id,
-      userId,
-    },
-  });
-}
-
-export async function clearAllNotifications(userId: string) {
-  return prisma.notification.deleteMany({
-    where: {
-      userId,
-    },
-  });
+    try {
+      return await this.create({
+        userId,
+        type: 'ACCOUNT',
+        ...notificationMap[notificationType],
+        link: '/profile'
+      });
+    } catch (error) {
+      console.error('Account notification creation failed:', error);
+    }
+  }
 }
