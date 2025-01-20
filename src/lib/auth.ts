@@ -1,47 +1,68 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+import NextAuth from 'next-auth';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import GoogleProvider from 'next-auth/providers/google';
+import EmailProvider from 'next-auth/providers/email';
+import prisma from './prisma';
 
-const prisma = new PrismaClient();
+export const authOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID as string,
+      clientSecret: process.env.GOOGLE_SECRET as string,
+      authorization: {
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          scope: 'openid email profile'
+        }
+      }
+    }),
+    EmailProvider({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: process.env.EMAIL_SERVER_PORT as string,
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD
+        }
+      },
+      from: process.env.EMAIL_FROM
+    })
+  ],
+  callbacks: {
+    async session({ session, user }) {
+      session.user.role = user.role;
+      session.user.id = user.id;
+      return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // Allow relative redirects
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      // Allow whitelisted domains
+      if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    }
+  },
+  events: {
+    async signIn(message) {
+      console.log('Sign in event', message);
+    }
+  },
+  pages: {
+    signIn: '/auth/signin',
+    signOut: '/auth/signout',
+    error: '/auth/error',
+    verifyRequest: '/auth/verify-request'
+  },
+  theme: {
+    colorScheme: 'auto'
+  },
+  session: {
+    strategy: 'database',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  debug: process.env.NODE_ENV !== 'production'
+};
 
-export async function hashPassword(password: string) {
-  return bcrypt.hash(password, 10);
-}
-
-export async function comparePasswords(password: string, hash: string) {
-  return bcrypt.compare(password, hash);
-}
-
-export function generateToken(userId: string) {
-  return jwt.sign({ userId }, process.env.JWT_SECRET!, {
-    expiresIn: '7d',
-  });
-}
-
-export async function validateToken(token: string) {
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    return decoded;
-  } catch (error) {
-    return null;
-  }
-}
-
-export async function authenticateUser(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return null;
-
-    const decoded = await validateToken(token);
-    if (!decoded) return null;
-
-    const user = await prisma.user.findUnique({
-      where: { id: (decoded as any).userId },
-    });
-
-    return user;
-  } catch (error) {
-    return null;
-  }
-}
+export default NextAuth(authOptions);
