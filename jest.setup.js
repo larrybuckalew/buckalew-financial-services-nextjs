@@ -1,19 +1,29 @@
-import '@testing-library/jest-dom';
-import { TextEncoder, TextDecoder } from 'util';
-import { configure } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
-
-configure({ testIdAttribute: 'data-testid' });
-
-jest.mock('next/router', () => require('next-router-mock'));
-jest.mock('next/navigation', () => ({
+// Mock Next.js router
+jest.mock('next/router', () => ({
   useRouter() {
     return {
-      push: jest.fn(),
-      replace: jest.fn(),
-      prefetch: jest.fn(),
+      route: '/',
+      pathname: '',
+      query: {},
+      asPath: '',
     };
   },
 }));
+
+// Mock NextAuth
+jest.mock('next-auth/react', () => ({
+  useSession: () => ({
+    data: null,
+    status: 'unauthenticated'
+  }),
+  getSession: () => null,
+  signIn: jest.fn(),
+  signOut: jest.fn()
+}));
+
+// Fail tests on any warning
+console.error = (message) => {
+  throw new Error(message);
+};
