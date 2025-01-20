@@ -1,0 +1,62 @@
+{
+  "application": "Buckalew Financial Services",
+  "monitoring": {
+    "performance": {
+      "responseTimeThreshold": 500,
+      "errorRateThreshold": 0.05,
+      "alertChannels": ["slack", "email"]
+    },
+    "resources": {
+      "cpuThreshold": 80,
+      "memoryThreshold": 85,
+      "diskThreshold": 90
+    },
+    "security": {
+      "failedLoginAttempts": 5,
+      "suspiciousActivityThreshold": 10
+    }
+  },
+  "alertRules": [
+    {
+      "name": "High Error Rate",
+      "condition": "errorRate > 0.05",
+      "severity": "high",
+      "actions": [
+        "send_slack_alert",
+        "send_email_notification",
+        "trigger_incident_response"
+      ]
+    },
+    {
+      "name": "Performance Degradation",
+      "condition": "averageResponseTime > 500",
+      "severity": "medium",
+      "actions": [
+        "send_slack_alert",
+        "log_performance_issue"
+      ]
+    },
+    {
+      "name": "Resource Exhaustion",
+      "condition": "cpuUsage > 90 || memoryUsage > 95",
+      "severity": "critical",
+      "actions": [
+        "send_immediate_alert",
+        "trigger_auto_scaling",
+        "generate_incident_report"
+      ]
+    }
+  ],
+  "notificationChannels": {
+    "slack": {
+      "webhook": "${SLACK_WEBHOOK_URL}",
+      "channel": "#buckalew-ops"
+    },
+    "email": {
+      "recipients": [
+        "ops@buckalew.com",
+        "engineering@buckalew.com"
+      ]
+    }
+  }
+}
