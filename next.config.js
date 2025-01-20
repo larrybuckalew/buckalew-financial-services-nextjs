@@ -12,6 +12,10 @@ const nextConfig = {
   },
   experimental: {
     optimizeCss: true,
+<<<<<<< HEAD
+=======
+    optimizeImages: true,
+>>>>>>> origin/feature/financial-calculators
     scrollRestoration: true,
   },
   compiler: {
@@ -30,4 +34,8 @@ const nextConfig = {
   },
 }
 
+<<<<<<< HEAD
 module.exports = withBundleAnalyzer(nextConfig)
+=======
+module.exports = withBundleAnalyzer(nextConfig)
+>>>>>>> origin/feature/financial-calculators
