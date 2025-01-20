@@ -1,0 +1,6 @@
+#!/bin/sh
+. ""/_/husky.sh
+
+# Run linting and tests before commit
+npm run lint
+npm run test
