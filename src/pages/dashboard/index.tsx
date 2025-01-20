@@ -1,82 +1,94 @@
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { MortgageCalculator } from '@/components/MortgageCalculator';
+import { GetServerSideProps } from 'next';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../lib/auth';
+import { UserRole } from '@prisma/client';
+import prisma from '../../lib/prisma';
 
-export default function Dashboard() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+// Dashboard components
+import InvestmentSummary from '../../components/dashboard/InvestmentSummary';
+import QuickActions from '../../components/dashboard/QuickActions';
+import RecentActivity from '../../components/dashboard/RecentActivity';
 
-  if (status === 'loading') {
-    return <div>Loading...</div>;
-  }
+interface DashboardProps {
+  investments: Array<{
+    id: string;
+    type: string;
+    amount: number;
+    date: string;
+  }>;
+  totalInvestmentValue: number;
+  recentActivities: Array<{
+    id: string;
+    type: string;
+    description: string;
+    date: string;
+  }>;
+}
 
-  if (!session) {
-    router.push('/login');
-    return null;
-  }
-
+const Dashboard: React.FC<DashboardProps> = ({
+  investments,
+  totalInvestmentValue,
+  recentActivities
+}) => {
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Welcome, {session.user.name || 'User'}
-          </h1>
-          <Button
-            onClick={() => router.push('/dashboard/profile')}
-            variant="outline"
-          >
-            Profile Settings
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Email: {session.user.email}</p>
-              <p className="text-gray-600">Role: {session.user.role}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button
-                onClick={() => router.push('/dashboard/mortgage-calculator')}
-                className="w-full"
-              >
-                Mortgage Calculator
-              </Button>
-              <Button
-                onClick={() => router.push('/dashboard/investment-planner')}
-                className="w-full"
-              >
-                Investment Planner
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">No recent activity</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="mt-6">
-          <MortgageCalculator />
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Your Financial Dashboard</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <InvestmentSummary 
+          investments={investments}
+          totalValue={totalInvestmentValue}
+        />
+        <QuickActions />
+        <RecentActivity activities={recentActivities} />
       </div>
     </div>
   );
-}
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+  
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/auth/signin',
+        permanent: false,
+      },
+    };
+  }
+
+  // Fetch user investments and recent activities
+  const investments = await prisma.investment.findMany({
+    where: { userId: session.user.id },
+    take: 5,
+    orderBy: { date: 'desc' }
+  });
+
+  const totalInvestmentValue = await prisma.investment.aggregate({
+    where: { userId: session.user.id },
+    _sum: { amount: true }
+  });
+
+  const recentActivities = await prisma.userActivity.findMany({
+    where: { userId: session.user.id },
+    take: 5,
+    orderBy: { createdAt: 'desc' }
+  });
+
+  return {
+    props: {
+      investments: investments.map(inv => ({
+        ...inv,
+        date: inv.date.toISOString()
+      })),
+      totalInvestmentValue: totalInvestmentValue._sum.amount?.toNumber() || 0,
+      recentActivities: recentActivities.map(act => ({
+        ...act,
+        date: act.createdAt.toISOString()
+      }))
+    }
+  };
+};
+
+export default Dashboard;
