@@ -13,6 +13,7 @@ async function main() {
       name: 'Larry Buckalew',
       role: UserRole.ADMIN,
       emailVerified: new Date(),
+      // Optional: Add profile creation if schema supports it
       profile: {
         create: {
           phoneNumber: '+1-555-123-4567',
