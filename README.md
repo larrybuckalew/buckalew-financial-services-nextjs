@@ -1,21 +1,141 @@
 # Buckalew Financial Services Web Application
 
-## Project Overview
-A comprehensive financial services web application built with Next.js, TypeScript, and modern web technologies.
+A Next.js-based web application for managing insurance policies, quotes, and financial calculations.
 
 ## Features
-- Advanced Error Handling
-- Performance Monitoring
-- Secure Authentication
-- Comprehensive Logging
-- Sentry Error Tracking
 
-## Setup Instructions
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Set up environment variables
-4. Run database migrations
-5. Start development server: `npm run dev`
+- 🔒 Secure authentication with NextAuth
+- 💰 Insurance policy management
+- 📊 Financial calculators
+- 📱 Responsive design
+- 🔐 Role-based access control
+- ⚡ Real-time premium calculations
+
+## Tech Stack
+
+- **Framework:** Next.js 14
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Authentication:** NextAuth.js
+- **Database:** PostgreSQL with Prisma
+- **Error Tracking:** Sentry
+- **Testing:** Jest & React Testing Library
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- PostgreSQL
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/larrybuckalew/buckalew-financial-services-nextjs.git
+   cd buckalew-financial-services-nextjs
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Copy environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Set up your environment variables in `.env`
+
+5. Set up the database:
+   ```bash
+   npx prisma migrate dev
+   ```
+
+6. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Project Structure
+
+```
+/src
+  /components
+    /ui          # Shared UI components
+    /insurance   # Insurance-related components
+    /calculators # Financial calculators
+    /layout      # Layout components
+  /lib
+    /auth       # Authentication utilities
+    /security   # Security-related utilities
+  /pages
+    /api        # API routes
+    /auth       # Authentication pages
+    /insurance  # Insurance pages
+    /dashboard  # Dashboard pages
+  /styles       # Global styles
+  /types        # TypeScript types
+/prisma         # Database schema and migrations
+```
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm test` - Run tests
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript compiler
+
+## Testing
+
+Run tests using Jest:
+
+```bash
+npm test
+```
+
+For test coverage:
+
+```bash
+npm run test:coverage
+```
+
+## Database Migrations
+
+Create a new migration:
+
+```bash
+npx prisma migrate dev --name your_migration_name
+```
+
+Apply migrations:
+
+```bash
+npx prisma migrate deploy
+```
 
 ## Contributing
-Please read our contribution guidelines before submitting pull requests.
+
+1. Create a new branch
+2. Make your changes
+3. Run tests and linting
+4. Submit a pull request
+
+## Security
+
+- All routes are protected with NextAuth
+- Role-based access control implemented
+- Two-factor authentication available
+- Regular security audits
+
+## License
+
+MIT
+
+## Contact
+
+For questions or support, please contact support@buckalewfinancial.com
