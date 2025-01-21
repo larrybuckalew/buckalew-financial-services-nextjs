@@ -1,6 +1,6 @@
 {
-  "name": "buckalew-financial-services",
-  "version": "0.2.0",
+  "name": "buckalew-financial-services-nextjs",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,36 +8,27 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "date-fns": "^4.1.0",
-    "next": "^14.x.x",
-    "next-auth": "^4.x.x",
-    "react": "^18.x.x",
-    "react-dom": "^18.x.x",
-    "recharts": "^2.15.0",
-    "xlsx": "^0.18.5"
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "next-auth": "latest",
+    "@prisma/client": "latest",
+    "@sentry/nextjs": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest"
   },
   "devDependencies": {
-    "@babel/plugin-transform-modules-commonjs": "^7.x.x",
-    "@babel/preset-env": "^7.x.x",
-    "@babel/preset-react": "^7.x.x",
-    "@babel/preset-typescript": "^7.x.x",
-    "@hookform/resolvers": "^3.x.x",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^14.3.1",
-    "@testing-library/user-event": "^14.x.x",
-    "babel-jest": "^29.7.0",
-    "exceljs": "^4.x.x",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^29.x.x",
-    "jest-environment-jsdom": "^29.x.x",
-    "jspdf": "^2.x.x",
-    "jspdf-autotable": "^3.x.x",
-    "papaparse": "^5.5.1",
-    "react-hook-form": "^7.x.x",
-    "zod": "^3.x.x"
+    "@types/react": "latest",
+    "@types/node": "latest",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
+    "jest": "latest",
+    "@testing-library/react": "latest",
+    "@testing-library/jest-dom": "latest",
+    "prisma": "latest"
   }
 }
