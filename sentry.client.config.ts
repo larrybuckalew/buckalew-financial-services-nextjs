@@ -1,59 +1,14 @@
 import * as Sentry from "@sentry/nextjs";
 
-const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN || '';
-const ENVIRONMENT = process.env.NODE_ENV || 'development';
-
 Sentry.init({
-  dsn: SENTRY_DSN,
-  
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  tracesSampleRate: ENVIRONMENT === 'production' ? 0.1 : 1.0,
-  
-  // Capture all errors in production
-  // In development, only capture errors that would crash the app
-  debug: ENVIRONMENT !== 'production',
-  
-  // Add environment information
-  environment: ENVIRONMENT,
-  
-  // Client-side specific configuration
-  integrations: [
-    new Sentry.BrowserTracing(),
-    new Sentry.Replay({
-      // Additional configuration for session replay
-      maskAllText: true,
-      maskAllInputs: true,
-      blockAllMedia: true
-    })
-  ],
-  
-  // Performance monitoring
-  tracePropagationTargets: [
-    'localhost',
-    /^https:\/\/buckalew-financial\.com/
-  ],
-  
-  // Error filtering
-  beforeSend(event) {
-    // Optionally modify or filter events
-    if (ENVIRONMENT === 'development') {
-      console.log('Sentry client event:', event);
-    }
-    
-    // Exclude sensitive data
-    if (event.request?.data) {
-      delete event.request.data.password;
-    }
-    
-    return event;
-  },
-  
-  // Error types to ignore
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1,
+  sampleRate: process.env.NODE_ENV === 'production' ? 0.5 : 1,
   ignoreErrors: [
-    'ResizeObserver loop limit exceeded',
-    'ChunkLoadError',
-    'Failed to fetch',
-    /^NetworkError/
-  ]
+    'ResizeObserver loop',
+    'NetworkError',
+    'AbortError'
+  ],
+  environment: process.env.NODE_ENV,
+  release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
 });
