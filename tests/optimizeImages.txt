@@ -1,0 +1,7 @@
+module.exports = {
+  experimental: {
+    optimizeCss: true,
+    scrollRestoration: true,
+    // Remove or update any unrecognized keys
+  },
+};
