@@ -1,9 +1,16 @@
-import { ErrorBoundary } from "@/components/error/error-boundary"
-import { AuthProvider } from "@/components/providers/auth-provider"
-import { Inter } from "next/font/google"
-import "./globals.css"
+import { Navbar } from '@/components/Navbar'
+import { Inter } from 'next/font/google'
+import './globals.css'
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata = {
+  title: {
+    default: 'Buckalew Financial Services',
+    template: '%s | Buckalew Financial Services',
+  },
+  description: 'Expert financial services including life insurance, health insurance, and Medicare solutions.',
+}
 
 export default function RootLayout({
   children,
@@ -13,9 +20,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ErrorBoundary>
-          <AuthProvider>{children}</AuthProvider>
-        </ErrorBoundary>
+        <Navbar />
+        <main>{children}</main>
       </body>
     </html>
   )
