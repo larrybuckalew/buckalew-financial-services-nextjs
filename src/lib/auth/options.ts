@@ -1,71 +1,55 @@
 import { NextAuthOptions } from "next-auth"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { prisma } from "@/lib/prisma"
+import prisma from "@/lib/prisma/db"
 import { compare } from "bcrypt"
 
 export const authOptions: NextAuthOptions = {
+  debug: true,
+  secret: "4e8455f5bd07cba1a7a398bacc941c00",
   adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt"
-  },
-  pages: {
-    signIn: "/login",
-  },
+  session: { strategy: "jwt" },
+  pages: { signIn: "/login" },
   providers: [
     CredentialsProvider({
+      id: "credentials",
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
-
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
+        try {
+          console.log("Auth attempt for:", credentials?.email);
+          
+          const user = await prisma.user.findUnique({
+            where: { email: credentials?.email }
+          });
+          
+          console.log("User found:", user?.email);
+          
+          if (!user?.password) {
+            console.log("No password found");
+            throw new Error("Invalid credentials");
           }
-        })
 
-        if (!user || !user.password) {
-          return null
-        }
+          const isValid = await compare(credentials?.password || "", user.password);
+          console.log("Password valid:", isValid);
 
-        const isPasswordValid = await compare(
-          credentials.password,
-          user.password
-        )
+          if (!isValid) {
+            throw new Error("Invalid credentials");
+          }
 
-        if (!isPasswordValid) {
-          return null
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
+          return null;
         }
       }
     })
-  ],
-  callbacks: {
-    async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
-      }
-      return session
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-        token.role = user.role
-      }
-      return token
-    }
-  }
+  ]
 }
