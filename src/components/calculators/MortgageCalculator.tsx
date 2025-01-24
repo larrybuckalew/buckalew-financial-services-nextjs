@@ -20,7 +20,7 @@ const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
   return (
     <div>
       <h2>Mortgage Calculator</h2>
-      <p>Monthly Payment: </p>
+      <p>Monthly Payment: {monthlyPayment}</p>
     </div>
   );
 };

@@ -23,3 +23,8 @@ export function handleClientError(error: Error) {
     }
   });
 }
+
+export function handleApiError(error: any) {
+  console.error("API Error: ", error);
+}
+
