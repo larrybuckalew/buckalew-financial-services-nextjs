@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { NextRequest, NextResponse } from 'next/server';
 import { verify } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
@@ -105,3 +106,15 @@ declare module 'next/server' {
     user?: JWTPayload;
   }
 }
+=======
+// src/middleware/authMiddleware.ts
+export const validateUserLogin = (req, res, next) => {
+  // Your validation logic
+  next();
+};
+
+export const checkAccountLockout = (req, res, next) => {
+  // Your lockout check logic
+  next();
+};
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b

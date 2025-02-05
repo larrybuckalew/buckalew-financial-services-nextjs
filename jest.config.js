@@ -9,6 +9,7 @@ const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+<<<<<<< HEAD
     '^@components/(.*)$': '<rootDir>/src/components/$1',
     '^@lib/(.*)$': '<rootDir>/src/lib/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
@@ -27,6 +28,10 @@ const customJestConfig = {
     '<rootDir>/e2e/',
     '\\.spec\\.ts$'
   ],
+=======
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
+  },
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
     '!src/**/*.d.ts',
@@ -45,6 +50,17 @@ const customJestConfig = {
       statements: 80
     }
   },
+<<<<<<< HEAD
   coverageReporters: ['json', 'lcov', 'text', 'clover', 'html'],
   coverageDirectory: '<rootDir>/coverage'
 }
+=======
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/'
+  ],
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }]
+  }
+};
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b

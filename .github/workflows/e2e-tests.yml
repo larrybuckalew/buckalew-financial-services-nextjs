@@ -1,4 +1,5 @@
 name: E2E Tests
+<<<<<<< HEAD
 
 on:
   push:
@@ -9,6 +10,16 @@ on:
 jobs:
   test:
     timeout-minutes: 60
+=======
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  e2e-tests:
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -17,12 +28,19 @@ jobs:
         node-version: 18
     - name: Install dependencies
       run: npm ci
+<<<<<<< HEAD
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
     - name: Build application
       run: npm run build
     - name: Run Playwright tests
       run: npx playwright test
+=======
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npm run test:e2e
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
     - uses: actions/upload-artifact@v3
       if: always()
       with:

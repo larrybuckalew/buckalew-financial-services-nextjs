@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+<<<<<<< HEAD
 
 :root {
   --color-primary: #285A84;
@@ -159,3 +160,5 @@ a:hover {
 .hover\:bg-blue-700:hover {
   background-color: #85C872 !important;
 }
+=======
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b

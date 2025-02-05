@@ -52,4 +52,11 @@ dist/
 .vscode/
 .idea/
 *.swp
+<<<<<<< HEAD
 *.swo
+=======
+*.swo
+
+# Sentry Config File
+.env.sentry-build-plugin
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b

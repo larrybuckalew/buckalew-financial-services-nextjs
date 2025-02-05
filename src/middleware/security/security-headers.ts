@@ -67,6 +67,7 @@ export function combineMiddleware(...middleware: Function[]) {
       });
     };
   });
+<<<<<<< HEAD
 }
 
 // Usage example:
@@ -75,3 +76,6 @@ export function combineMiddleware(...middleware: Function[]) {
 //   withAuth(['read:users']),
 //   rateLimiter({ max: 100 })
 // )(handler);
+=======
+}
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b

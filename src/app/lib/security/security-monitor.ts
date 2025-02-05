@@ -41,12 +41,18 @@ export class SecurityMonitor {
       ]
     );
 
+<<<<<<< HEAD:src/app/lib/security/security-monitor.ts
     // Check for suspicious patterns
+=======
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b:src/lib/security/security-monitor.ts
     await this.checkForSuspiciousActivity(event);
   }
 
   private async checkForSuspiciousActivity(event: SecurityEvent): Promise<void> {
+<<<<<<< HEAD:src/app/lib/security/security-monitor.ts
     // Check for multiple failed login attempts
+=======
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b:src/lib/security/security-monitor.ts
     if (event.type === 'login_attempt' && event.status === 'failure') {
       const failedAttempts = await this.db.executeQuery<{ count: number }>(
         `SELECT COUNT(*) as count
@@ -72,7 +78,10 @@ export class SecurityMonitor {
       }
     }
 
+<<<<<<< HEAD:src/app/lib/security/security-monitor.ts
     // Check for password reset abuse
+=======
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b:src/lib/security/security-monitor.ts
     if (event.type === 'password_reset') {
       const recentResets = await this.db.executeQuery<{ count: number }>(
         `SELECT COUNT(*) as count
@@ -96,7 +105,10 @@ export class SecurityMonitor {
       }
     }
 
+<<<<<<< HEAD:src/app/lib/security/security-monitor.ts
     // Monitor role and permission changes
+=======
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b:src/lib/security/security-monitor.ts
     if (event.type === 'role_change' || event.type === 'permission_change') {
       const recentChanges = await this.db.executeQuery<{ count: number }>(
         `SELECT COUNT(*) as count
@@ -137,6 +149,7 @@ export class SecurityMonitor {
       ) VALUES ($1, $2, $3, $4, NOW(), 'open')`,
       [alert.type, alert.severity, alert.source, JSON.stringify(alert.details)]
     );
+<<<<<<< HEAD:src/app/lib/security/security-monitor.ts
 
     // Additional notification logic can be added here
     // For example, sending alerts to a security team
@@ -148,6 +161,14 @@ export class SecurityMonitor {
       endDate?: Date;
     }
   ): Promise<SecurityEvent[]> {
+=======
+  }
+
+  async getSecurityEvents(filter: Partial<SecurityEvent> & { 
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<SecurityEvent[]> {
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b:src/lib/security/security-monitor.ts
     const conditions = [];
     const params = [];
     let paramCount = 1;
@@ -190,10 +211,20 @@ export class SecurityMonitor {
     );
   }
 
+<<<<<<< HEAD:src/app/lib/security/security-monitor.ts
   async getSecurityAlerts(
     status: 'open' | 'closed' | 'all' = 'open',
     severity?: 'low' | 'medium' | 'high'
   ): Promise<any[]> {
+=======
+  async getSecurityAlerts({
+    status = 'open',
+    severity,
+  }: {
+    status?: 'open' | 'investigating' | 'resolved' | 'false_positive';
+    severity?: 'low' | 'medium' | 'high' | 'critical';
+  } = {}): Promise<any[]> {
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b:src/lib/security/security-monitor.ts
     const conditions = [];
     const params = [];
     let paramCount = 1;

@@ -4,10 +4,13 @@ import { RBACService } from '@/lib/auth/rbac-service';
 import { DatabaseService } from '@/lib/db/db-service';
 import { Permission } from '@/lib/types/auth';
 
+<<<<<<< HEAD
 const db = new DatabaseService();
 const sessionService = new SessionService(db);
 const rbacService = new RBACService(db);
 
+=======
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
 export interface AuthenticatedRequest extends NextApiRequest {
   user?: {
     id: string;
@@ -29,12 +32,20 @@ export function withAuth(
       }
 
       const token = authHeader.substring(7);
+<<<<<<< HEAD
+=======
+      const db = new DatabaseService();
+      const sessionService = new SessionService(db);
+      const rbacService = new RBACService(db);
+
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
       const session = await sessionService.validateSession(token);
 
       if (!session) {
         return res.status(401).json({ message: 'Invalid session' });
       }
 
+<<<<<<< HEAD
       // Add user information to the request
       req.user = {
         id: session.user_id,
@@ -43,6 +54,14 @@ export function withAuth(
       };
 
       // Check permissions if required
+=======
+      req.user = {
+        id: session.user_id,
+        email: '', // Fetch from database if needed
+        roles: await rbacService.getRoles(session.user_id),
+      };
+
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
       if (requiredPermissions.length > 0) {
         const hasAllPermissions = await Promise.all(
           requiredPermissions.map(permission =>
@@ -61,4 +80,8 @@ export function withAuth(
       return res.status(500).json({ message: 'Internal server error' });
     }
   };
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b

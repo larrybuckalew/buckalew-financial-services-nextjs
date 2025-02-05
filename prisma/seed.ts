@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcryptjs'
+=======
+﻿import { PrismaClient } from '@prisma/client'
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
 
 const prisma = new PrismaClient()
 
 async function main() {
+<<<<<<< HEAD
   try {
     // Create admin role
     const adminRole = await prisma.role.upsert({
@@ -42,3 +47,16 @@ async function main() {
 }
 
 main().catch(console.error);
+=======
+  // Seed data logic here
+}
+
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.()
+  })
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b

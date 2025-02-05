@@ -1,11 +1,20 @@
+<<<<<<< HEAD
 # Enable error handling
+=======
+﻿# Enable error handling
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
 $ErrorActionPreference = "Stop"
 
 function Write-Step {
     param(
         [string]$Message
     )
+<<<<<<< HEAD
     Write-Host "`n=== $Message ===" -ForegroundColor Cyan
+=======
+    Write-Host "
+=== $Message ===" -ForegroundColor Cyan
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
 }
 
 Write-Step "Installing dependencies"
@@ -64,9 +73,18 @@ try {
     Write-Step "Initializing Prisma"
     npx prisma generate
 
+<<<<<<< HEAD
     Write-Host "`nAll dependencies installed successfully!" -ForegroundColor Green
+=======
+    Write-Host "
+All dependencies installed successfully!" -ForegroundColor Green
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
 }
 catch {
     Write-Host "Error installing dependencies: $_" -ForegroundColor Red
     exit 1
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b

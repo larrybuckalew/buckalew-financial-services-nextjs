@@ -4,6 +4,11 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+<<<<<<< HEAD
+=======
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -17,7 +22,10 @@
         "name": "next"
       }
     ],
+<<<<<<< HEAD
     "baseUrl": ".",
+=======
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b
     "paths": {
       "@/*": ["./src/*"]
     }

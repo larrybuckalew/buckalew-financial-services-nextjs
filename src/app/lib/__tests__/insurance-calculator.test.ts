@@ -94,4 +94,8 @@ describe('InsuranceCalculator', () => {
       expect(recommendations.coverageAmountRange.max).toBeGreaterThan(recommendations.coverageAmountRange.min);
     });
   });
+<<<<<<< HEAD:src/app/lib/__tests__/insurance-calculator.test.ts
 });
+=======
+});
+>>>>>>> 2cf111364f7c46e4f08e582ede8aebf03360532b:src/lib/__tests__/insurance-calculator.test.ts
