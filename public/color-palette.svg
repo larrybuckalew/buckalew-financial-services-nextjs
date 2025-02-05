@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="300" fill="white"/>
+  
+  <!-- Color Blocks -->
+  <rect x="50" y="50" width="100" height="200" fill="#85C872"/>
+  <text x="100" y="270" text-anchor="middle" font-family="Arial" fill="#285A84">#85C872</text>
+  
+  <rect x="200" y="50" width="100" height="200" fill="#C2EF7E"/>
+  <text x="250" y="270" text-anchor="middle" font-family="Arial" fill="#285A84">#C2EF7E</text>
+  
+  <rect x="350" y="50" width="100" height="200" fill="#5EA669"/>
+  <text x="400" y="270" text-anchor="middle" font-family="Arial" fill="white">#5EA669</text>
+  
+  <rect x="500" y="50" width="100" height="200" fill="#285A84"/>
+  <text x="550" y="270" text-anchor="middle" font-family="Arial" fill="white">#285A84</text>
+</svg>

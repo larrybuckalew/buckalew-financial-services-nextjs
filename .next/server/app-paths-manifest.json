@@ -1,0 +1,8 @@
+{
+  "/about/page": "app/about/page.js",
+  "/page": "app/page.js",
+  "/guides/life-insurance/benefits-of-early-life-insurance/page": "app/guides/life-insurance/benefits-of-early-life-insurance/page.js",
+  "/api/leads/route": "app/api/leads/route.js",
+  "/calculators/page": "app/calculators/page.js",
+  "/resources/educational/page": "app/resources/educational/page.js"
+}

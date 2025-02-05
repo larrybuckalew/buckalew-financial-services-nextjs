@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" fill="#5EA669"/>
+  <text x="300" y="200" font-family="Arial" font-size="24" text-anchor="middle" fill="#285A84">
+    Life Insurance
+  </text>
+  <rect x="50" y="300" width="500" height="50" fill="#85C872"/>
+  <text x="300" y="330" font-family="Arial" font-size="16" text-anchor="middle" fill="white">
+    Family Protection Strategies
+  </text>
+</svg>

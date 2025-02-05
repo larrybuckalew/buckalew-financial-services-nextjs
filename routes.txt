@@ -1,0 +1,19 @@
+Routes in this project:
+
+/ (Home Page)
+/about
+/insurance
+/services
+/calculators
+/dashboard
+/register
+/blog
+/appointments
+/login
+
+Expected dynamic routes:
+/medicare
+/life-insurance
+/health-insurance
+/quote
+/contact

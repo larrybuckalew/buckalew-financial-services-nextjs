@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-sans;
+}
+
+.error-boundary {
+  @apply text-center text-red-600 p-8 bg-red-50 rounded-lg m-4;
+}

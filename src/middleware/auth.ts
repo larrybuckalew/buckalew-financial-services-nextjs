@@ -1,0 +1,1 @@
+export const withAuth = (fn: any) => fn;

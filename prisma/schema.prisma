@@ -7,73 +7,24 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  investments   Investment[]
-  mortgages     Mortgage[]
-  retirement    RetirementPlan[]
+model GatedContentDownload {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phoneNumber String
+  contactMethod String
+  interestedIn String[]
+  pdfTitle   String
+  downloadedAt DateTime @default(now())
+
+  @@index([email])
+  @@index([pdfTitle])
 }
 
-model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Investment {
-  id            String   @id @default(cuid())
-  userId        String
-  initialAmount Float
-  monthlyContribution Float
-  interestRate  Float
-  years         Int
-  user          User     @relation(fields: [userId], references: [id])
-}
-
-model Mortgage {
-  id            String   @id @default(cuid())
-  userId        String
-  loanAmount    Float
-  interestRate  Float
-  loanTerm      Int
-  downPayment   Float
-  user          User     @relation(fields: [userId], references: [id])
-}
-
-model RetirementPlan {
-  id              String   @id @default(cuid())
-  userId          String
-  currentAge      Int
-  retirementAge   Int
-  currentSavings  Float
-  monthlyContribution Float
-  expectedReturn  Float
-  user            User     @relation(fields: [userId], references: [id])
+model MarketingConsent {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  optInMarketing Boolean @default(false)
+  optInDate  DateTime @default(now())
 }

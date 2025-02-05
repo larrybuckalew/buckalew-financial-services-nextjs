@@ -1,0 +1,28 @@
+name: Add Comprehensive Project Changes
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_message:
+        description: 'Commit message'
+        required: true
+        default: 'Add comprehensive project setup files'
+
+jobs:
+  add-changes:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: feature/comprehensive-setup
+    
+    - name: Configure Git
+      run: |
+        git config user.name "Larry Buckalew"
+        git config user.email "larry.buckalew@gmail.com"
+    
+    - name: Add all new files
+      run: |
+        git add .
+        git commit -m "${{ github.event.inputs.commit_message }}"
+        git push origin feature/comprehensive-setup

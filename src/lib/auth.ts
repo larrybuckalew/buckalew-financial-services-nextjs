@@ -1,69 +1,79 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "./prisma";
-import { compare } from "bcrypt";
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+import { User } from '@/types/auth'
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/auth/signin",
-    signOut: "/auth/signout",
-    error: "/auth/error",
-  },
-  providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+// JWT Secret - IMPORTANT: This should be a strong, environment-specific secret
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_development_secret'
+const JWT_EXPIRATION = '1h'
+const REFRESH_TOKEN_EXPIRATION = '7d'
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        });
+interface TokenPayload {
+  userId: string
+  email: string
+  role: string
+}
 
-        if (!user || !user.password) {
-          return null;
-        }
+export async function hashPassword(password: string): Promise<string> {
+  const salt = await bcrypt.genSalt(10)
+  return bcrypt.hash(password, salt)
+}
 
-        const isValid = await compare(credentials.password, user.password);
+export async function comparePasswords(
+  plainPassword: string, 
+  hashedPassword: string
+): Promise<boolean> {
+  return bcrypt.compare(plainPassword, hashedPassword)
+}
 
-        if (!isValid) {
-          return null;
-        }
+export function generateTokens(user: User): { 
+  accessToken: string, 
+  refreshToken: string 
+} {
+  const accessToken = jwt.sign(
+    { 
+      userId: user.id, 
+      email: user.email, 
+      role: user.role 
+    }, 
+    JWT_SECRET, 
+    { expiresIn: JWT_EXPIRATION }
+  )
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        };
-      },
-    }),
-  ],
-  callbacks: {
-    async session({ token, session }) {
-      if (token) {
-        session.user.id = token.id;
-        session.user.name = token.name;
-        session.user.email = token.email;
-      }
-      return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-  },
-};
+  const refreshToken = jwt.sign(
+    { 
+      userId: user.id, 
+      email: user.email 
+    }, 
+    JWT_SECRET, 
+    { expiresIn: REFRESH_TOKEN_EXPIRATION }
+  )
+
+  return { accessToken, refreshToken }
+}
+
+export function validateToken(token: string): TokenPayload {
+  try {
+    return jwt.verify(token, JWT_SECRET) as TokenPayload
+  } catch (error) {
+    throw new Error('Invalid or expired token')
+  }
+}
+
+export function refreshAccessToken(refreshToken: string): string {
+  try {
+    const decoded = jwt.verify(refreshToken, JWT_SECRET) as TokenPayload
+    
+    // Generate new access token
+    return jwt.sign(
+      { 
+        userId: decoded.userId, 
+        email: decoded.email, 
+        role: decoded.role 
+      }, 
+      JWT_SECRET, 
+      { expiresIn: JWT_EXPIRATION }
+    )
+  } catch (error) {
+    throw new Error('Invalid refresh token')
+  }
+}

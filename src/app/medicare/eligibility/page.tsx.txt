@@ -1,0 +1,216 @@
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { generatePageMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Eligibility for Medicare | Are You Qualified?',
+  description: 'Learn about Medicare eligibility requirements and find out if you qualify for coverage.',
+  path: '/health-insurance/eligibility'
+});
+
+const features = [
+  {
+    title: "Age Requirement",
+    description: "Most people qualify at age 65",
+    icon: "🎂"
+  },
+  {
+    title: "Disability",
+    description: "Eligible after receiving SSDI for 24 months",
+    icon: "♿"
+  },
+  {
+    title: "Specific Conditions",
+    description: "Coverage for ALS or ESRD patients",
+    icon: "🩺"
+  },
+  {
+    title: "Easy Enrollment",
+    description: "Sign up during your Initial Enrollment Period",
+    icon: "📋"
+  }
+];
+
+export default function EligibilityPage() {
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="bg-gradient-primary text-white py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl font-bold mb-6">Eligibility for Medicare</h1>
+            <p className="text-xl mb-8">
+              Find out if you qualify for Medicare coverage and how to enroll
+            </p>
+            <Link
+              href="/quote"
+              className="bg-secondary hover:bg-secondary-dark text-white px-8 py-3 rounded-lg transition duration-300"
+            >
+              Check Your Eligibility
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-lg p-6 text-center">
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-bold text-primary mb-3">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Who Is Eligible for Medicare? */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-primary mb-12">Who Is Eligible for Medicare?</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold text-primary mb-3">Age-Based Eligibility</h3>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-center">
+                  <span className="text-secondary mr-2">✓</span>
+                  U.S. citizens or legal residents aged 65+
+                </li>
+                <li className="flex items-center">
+                  <span className="text-secondary mr-2">✓</span>
+                  Automatically enrolled if already receiving Social Security
+                </li>
+                <li className="flex items-center">
+                  <span className="text-secondary mr-2">✓</span>
+                  Can enroll manually if not automatically enrolled
+                </li>
+              </ul>
+            </div>
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold text-primary mb-3">Disability-Based Eligibility</h3>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-center">
+                  <span className="text-secondary mr-2">✓</span>
+                  Eligible after receiving SSDI for 24 months
+                </li>
+                <li className="flex items-center">
+                  <span className="text-secondary mr-2">✓</span>
+                  Coverage begins automatically after the waiting period
+                </li>
+                <li className="flex items-center">
+                  <span className="text-secondary mr-2">✓</span>
+                  Includes Part A (hospital insurance) and Part B (medical insurance)
+                </li>
+              </ul>
+            </div>
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold text-primary mb-3">Special Conditions</h3>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-center">
+                  <span className="text-secondary mr-2">✓</span>
+                  Amyotrophic Lateral Sclerosis (ALS)
+                </li>
+                <li className="flex items-center">
+                  <span className="text-secondary mr-2">✓</span>
+                  End-Stage Renal Disease (ESRD)
+                </li>
+                <li className="flex items-center">
+                  <span className="text-secondary mr-2">✓</span>
+                  Immediate eligibility for Medicare coverage
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Is Eligibility Important? */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-primary mb-12">Why Is Eligibility Important?</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-secondary">
+              <h3 className="text-xl font-bold text-primary mb-3">Access to Healthcare</h3>
+              <p className="text-gray-600">
+                Medicare provides essential coverage for hospital stays, doctor visits, and more.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-secondary">
+              <h3 className="text-xl font-bold text-primary mb-3">Financial Protection</h3>
+              <p className="text-gray-600">
+                Helps reduce out-of-pocket costs for medical care.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-secondary">
+              <h3 className="text-xl font-bold text-primary mb-3">Timely Enrollment</h3>
+              <p className="text-gray-600">
+                Avoid penalties by enrolling during your Initial Enrollment Period.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-secondary">
+              <h3 className="text-xl font-bold text-primary mb-3">Peace of Mind</h3>
+              <p className="text-gray-600">
+                Ensures you have coverage when you need it most.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Frequently Asked Questions */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-primary mb-12">Frequently Asked Questions</h2>
+          <div className="max-w-3xl mx-auto space-y-6">
+            {[
+              {
+                question: "How do I know if I’m eligible for Medicare?",
+                answer: "You are eligible if you are 65+ years old, have a qualifying disability, or have specific conditions like ALS or ESRD."
+              },
+              {
+                question: "When can I enroll in Medicare?",
+                answer: "You can enroll during your Initial Enrollment Period, which starts 3 months before your 65th birthday and ends 3 months after."
+              },
+              {
+                question: "What happens if I miss my enrollment period?",
+                answer: "You may face late enrollment penalties unless you qualify for a Special Enrollment Period."
+              }
+            ].map((faq, index) => (
+              <div key={index} className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-xl font-bold text-primary mb-2">{faq.question}</h3>
+                <p className="text-gray-600">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call-to-Action Footer */}
+      <section className="py-16 bg-primary text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-6">Check Your Eligibility Today</h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Ensure you’re covered with Medicare when you need it most
+          </p>
+          <div className="flex justify-center gap-4">
+            <Link
+              href="/quote"
+              className="bg-secondary hover:bg-secondary-dark text-white px-8 py-3 rounded-lg transition duration-300"
+            >
+              Check Eligibility
+            </Link>
+            <Link
+              href="/contact"
+              className="bg-white text-primary hover:bg-gray-100 px-8 py-3 rounded-lg transition duration-300"
+            >
+              Speak with an Advisor
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
