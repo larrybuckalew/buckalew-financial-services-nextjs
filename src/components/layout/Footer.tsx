@@ -1,7 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
+import { getFeaturedPosts } from '@/lib/blog';
 
 const Footer = () => {
+  // Get the 3 most recent featured blog posts
+  const recentBlogPosts = getFeaturedPosts().slice(0, 3);
+
   const footerSections = {
     company: {
       title: 'Company',
@@ -30,15 +34,6 @@ const Footer = () => {
         { name: 'Dental & Vision', href: '/health-insurance/dental' },
       ]
     },
-    blog: { // New blog section
-      title: 'Recent Blog Posts',
-      links: [
-        { name: 'Blog Post Title 1', href: '#' }, // Placeholder
-        { name: 'Blog Post Title 2', href: '#' }, // Placeholder
-        { name: 'Blog Post Title 3', href: '#' }, // Placeholder
-        // This section would typically fetch dynamic data
-      ]
-    },
     legal: {
       title: 'Legal',
       links: [
@@ -52,15 +47,15 @@ const Footer = () => {
     <footer className="bg-gray-900 text-white">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Contact Information */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Buckalew Financial Services</h3> {/* Added business name */}
+            <h3 className="text-lg font-semibold mb-4">Buckalew Financial Services</h3>
             <div className="space-y-3">
               <p>3031 Mojave Oak Dr</p>
               <p>Valrico, FL 33594</p>
               <p className="mt-4">Phone: 844-779-7600</p>
-              <p>Email: larry@buckalewfinancialservices.com</p> {/* Corrected email */}
+              <p>Email: larry@buckalewfinancialservices.com</p>
             </div>
           </div>
 
@@ -82,6 +77,52 @@ const Footer = () => {
               </ul>
             </div>
           ))}
+
+          {/* Recent Blog Posts Section */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Recent Blog Posts</h3>
+            <ul className="space-y-3">
+              {recentBlogPosts.length > 0 ? (
+                recentBlogPosts.map((post) => (
+                  <li key={post.id}>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="text-gray-300 hover:text-white transition-colors line-clamp-2"
+                      title={post.title}
+                    >
+                      {post.title}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li>
+                    <Link href="/blog" className="text-gray-300 hover:text-white transition-colors">
+                      Visit our blog for insights
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/blog" className="text-gray-300 hover:text-white transition-colors">
+                      Financial planning tips
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/blog" className="text-gray-300 hover:text-white transition-colors">
+                      Insurance guidance
+                    </Link>
+                  </li>
+                </>
+              )}
+              <li className="pt-2">
+                <Link
+                  href="/blog"
+                  className="text-blue-400 hover:text-blue-300 transition-colors text-sm font-medium"
+                >
+                  View All Posts →
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Social Media Links */}

@@ -1,0 +1,61 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.app {
+  text-align: center;
+}
+
+.controls {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.board {
+  display: inline-grid;
+  gap: 4px;
+  background: #333;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.row {
+  display: contents;
+}
+
+.cell {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #2b2b2b;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 4px;
+  user-select: none;
+  font-weight: 700;
+}
+
+.cell.revealed {
+  background: #3a3a3a;
+  border-color: #555;
+}
+
+.cell.mine {
+  background: #8b0000;
+}
+
+.cell.flagged {
+  background: #2b2b2b;
+  color: #ffcc00;
+}
+
+.status {
+  margin: 0.5rem 0 1rem 0;
+}

@@ -1,0 +1,89 @@
+# ⚡ QUICK FIX - PostgreSQL Security & Password
+
+## 🎯 What You Need to Do RIGHT NOW:
+
+### 1. Run This Script (Does Everything):
+```bash
+reset-postgres-password.bat
+```
+
+This automatically:
+- ✓ Sets password to `Buckalew2025`
+- ✓ Fixes security (changes `trust` back to `scram-sha-256`)
+- ✓ Restarts PostgreSQL
+- ✓ Updates .env.local
+- ✓ Tests connection
+
+### 2. Then Run Setup:
+```bash
+setup-postgres17.bat
+```
+
+### 3. Start Website:
+```bash
+npm run dev
+```
+
+### 4. Login:
+- http://localhost:3000/login
+- Email: larry@buckalewfinancialservices.com
+- Password: Larry123!@#
+
+---
+
+## 🛠️ If Script Doesn't Work - Do This Manually:
+
+### Quick Manual Steps:
+
+1. **Set Password** (while trust is still active):
+```bash
+cd "C:\Program Files\PostgreSQL\17\bin"
+psql -U postgres
+ALTER USER postgres WITH PASSWORD 'Buckalew2025';
+\q
+```
+
+2. **Fix pg_hba.conf**:
+- Open: `C:\Program Files\PostgreSQL\17\data\pg_hba.conf`
+- Change all `trust` to `scram-sha-256`
+- Save
+
+3. **Restart Service**:
+- Win+R → services.msc
+- Find postgresql-x64-17
+- Right-click → Restart
+
+4. **Update .env.local**:
+```env
+DATABASE_URL=postgresql://postgres:Buckalew2025@localhost:5432/Buckalew?schema=public
+```
+
+5. **Setup & Run**:
+```bash
+setup-postgres17.bat
+npm run dev
+```
+
+---
+
+## 📋 Your Passwords:
+
+**PostgreSQL:**
+- Username: `postgres`
+- Password: `Buckalew2025`
+
+**Website Admin:**
+- Email: `larry@buckalewfinancialservices.com`
+- Password: `Larry123!@#`
+
+---
+
+## ✅ Done When You Can:
+- [ ] Connect to PostgreSQL with password
+- [ ] Run `npm run dev` without errors
+- [ ] Login to website
+- [ ] Access /admin dashboard
+
+---
+
+**See SECURITY_FIX_GUIDE.md for detailed manual instructions if needed!**

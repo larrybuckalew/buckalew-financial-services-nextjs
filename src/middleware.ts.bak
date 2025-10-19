@@ -1,0 +1,52 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+// Define route access permissions
+const ROUTE_PERMISSIONS = {
+  public: [
+    '/',
+    '/login',
+    '/register',
+    '/services',
+    '/contact',
+    '/medicare',
+    '/health-insurance',
+    '/life-insurance',
+    '/terms-of-service',
+    '/privacy-policy',
+    '/drug-pricing',
+    '/resources',
+    '/calculators',
+    '/about',
+    '/blog'
+  ],
+  user: [
+    '/dashboard',
+    '/profile',
+    '/appointments',
+    '/quote',
+    '/review'
+  ],
+  admin: [
+    '/admin',
+    '/admin/dashboard'
+  ]
+};
+
+export function middleware(request: NextRequest) {
+  // Temporarily disable middleware to debug issues
+  return NextResponse.next();
+}
+
+// See "Matching Paths" below to learn more
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+};

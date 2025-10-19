@@ -1,22 +1,36 @@
-module.exports = {
-  testEnvironment: 'jsdom',
+const nextJest = require('next/jest')
+
+const createJestConfig = nextJest({
+  dir: './',
+})
+
+const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testEnvironment: 'jsdom',
+  testMatch: [
+    '**/__tests__/**/*.(ts|tsx|js|jsx)',
+    '**/*.(test|spec).(ts|tsx|js|jsx)',
+  ],
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx,js,jsx}',
+    '!src/**/*.d.ts',
+    '!src/**/*.stories.{ts,tsx,js,jsx}',
+    '!src/**/index.{ts,tsx,js,jsx}',
+  ],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
-    '^.+\\.mjs$': 'babel-jest',
-  },
+  testPathIgnorePatterns: [
+    '<rootDir>/.next/',
+    '<rootDir>/node_modules/',
+    '<rootDir>/dist/',
+  ],
   transformIgnorePatterns: [
-    'node_modules/(?!(uuid|xlsx|recharts|papaparse)/)'
+    '/node_modules/',
+    '^.+\\.module\\.(css|sass|scss)$',
   ],
-  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
-  collectCoverageFrom: [
-    'src/**/*.{js,jsx,ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/pages/_app.tsx',
-    '!src/pages/_document.tsx'
-  ],
-};
+}
+
+module.exports = createJestConfig(customJestConfig)

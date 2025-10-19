@@ -1,0 +1,16 @@
+{
+  "name": "email-templates-standalone",
+  "version": "1.0.0",
+  "description": "Standalone email templating and sending system.",
+  "main": "sendEmail.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "handlebars": "^4.7.8",
+    "nodemailer": "^7.0.6"
+  }
+}

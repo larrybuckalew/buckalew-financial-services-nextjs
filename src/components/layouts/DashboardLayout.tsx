@@ -17,6 +17,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Investments', href: '/dashboard/investments', icon: 'ChartBarIcon' },
     { name: 'Profile', href: '/dashboard/profile', icon: 'UserIcon' },
     { name: 'Settings', href: '/dashboard/settings', icon: 'CogIcon' },
+    { name: 'Analytics', href: '/dashboard/analytics', icon: 'ChartBarIcon' },
   ];
 
   return (

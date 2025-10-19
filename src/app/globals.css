@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Company Colors */
+  --primary: #285A84;  /* Primary Blue */
+  --primary-light: #C2EF7E;  /* Light Green */
+  --primary-dark: #5EA669;   /* Medium Green */
+  --accent: #85C872;         /* Accent Green */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  background: rgb(245, 245, 245);
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Prevent horizontal scrolling on all containers */
+#__next {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Ensure images don't overflow */
+img {
+  max-width: 100%;
+  height: auto;
+}

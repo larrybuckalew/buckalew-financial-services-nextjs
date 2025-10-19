@@ -1,0 +1,125 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: buckalew_financial_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Setup environment variables
+      run: |
+        cp .env.example .env.local
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/buckalew_financial_test" >> .env.local
+    
+    - name: Generate Prisma Client
+      run: npx prisma generate
+    
+    - name: Run database migrations
+      run: npx prisma migrate deploy
+    
+    - name: Run linter
+      run: npm run lint
+    
+    - name: Run unit tests
+      run: npm test
+      env:
+        CI: true
+    
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+    
+    - name: Run E2E tests
+      run: npm run test:e2e
+      env:
+        CI: true
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: test-results/
+        retention-days: 30
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+      env:
+        CI: true
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build
+        path: .next
+        retention-days: 5
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Download build artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: build
+        path: .next
+    
+    - name: Deploy to Vercel
+      run: |
+        npm install --global vercel
+        vercel deploy --prod --token ${{ secrets.VERCEL_TOKEN }}
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

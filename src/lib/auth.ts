@@ -32,11 +32,11 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
-        if (!user || !user.password) {
+        if (!user || !user.hashedPassword) {
           return null;
         }
 
-        const isValid = await compare(credentials.password, user.password);
+        const isValid = await compare(credentials.password, user.hashedPassword);
 
         if (!isValid) {
           return null;
